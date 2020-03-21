@@ -3,7 +3,7 @@ model:
 dataset: cifar10
 aug: fa_reduced_cifar10
 loss: ce
-cutout: 16
+cutout: 0
 batch: 128
 epoch: 200
 lr: 0.1
