@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+torch = "==1.2.0"
+thceconf = {git = "https://github.com/wbaek/theconf"}
+warmup-scheduler = {ref = "08f7d5e",git = "https://github.com/ildoonet/pytorch-gradual-warmup-lr.git"}
+pystopwatch2 = {git = "https://github.com/ildoonet/pystopwatch2.git"}
+hyperopt = {git = "https://github.com/hyperopt/hyperopt.git"}
+pretrainedmodels = "*"
+tqdm = "*"
+sklearn = "*"
+ray = "*"
+matplotlib = "*"
+psutil = "*"
+requests = "*"
+tensorboardX = "*"
+tensorboard = "*"
+torchvision = "==0.4.0"
+
+[requires]
+python_version = "3.6"

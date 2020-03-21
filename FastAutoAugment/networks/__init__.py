@@ -8,6 +8,7 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 
 from FastAutoAugment.networks.resnet import ResNet
+from FastAutoAugment.networks.resnet56 import ResNet56
 from FastAutoAugment.networks.pyramidnet import PyramidNet
 from FastAutoAugment.networks.shakeshake.shake_resnet import ShakeResNet
 from FastAutoAugment.networks.wideresnet import WideResNet
@@ -27,6 +28,8 @@ def get_model(conf, num_class=10, local_rank=-1):
         model = WideResNet(40, 2, dropout_rate=0.0, num_classes=num_class)
     elif name == 'wresnet28_10':
         model = WideResNet(28, 10, dropout_rate=0.0, num_classes=num_class)
+    elif name == 'resnet56':
+        model = ResNet56()
 
     elif name == 'shakeshake26_2x32d':
         model = ShakeResNet(26, 32, num_class)
