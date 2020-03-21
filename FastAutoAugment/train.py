@@ -7,6 +7,7 @@ import itertools
 import json
 import logging
 import math
+import moment
 import os
 from collections import OrderedDict
 
@@ -329,6 +330,13 @@ def train_and_eval(tag, dataroot, test_ratio=0.0, cv_fold=0, reporter=None, metr
                         'ema': ema.state_dict() if ema is not None else None,
                     }, save_path)
 
+    ts = moment.now().format("YYYY_MMDD_HHmm_ss")
+    mname = C.get()['model']['type']
+    os.makedirs('models', exist_ok=True)
+    torch.save(
+        model.state_dict(),
+        f'models/{mname}__{ts}.pth'
+    )
     del model
 
     result['top1_test'] = best_top1
