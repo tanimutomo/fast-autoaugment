@@ -132,9 +132,16 @@ def train_and_eval(tag, dataroot, test_ratio=0.0, cv_fold=0, reporter=None, metr
     model_ema = get_model(C.get()['model'], num_class(C.get()['dataset']), local_rank=-1)
     model_ema.eval()
 
-    criterion_ce = criterion = CrossEntropyLabelSmooth(num_class(C.get()['dataset']), C.get().conf.get('lb_smooth', 0))
+    # loss function
+    if C.get()['loss'] == 'cels':
+        criterion_ce = criterion = CrossEntropyLabelSmooth(num_class(C.get()['dataset']), C.get().conf.get('lb_smooth', 0))
+    elif C.get()['loss'] == 'ce':
+        criterion_ce = criterion = nn.CrossEntropyLoss()
     if C.get().conf.get('mixup', 0.0) > 0.0:
         criterion = CrossEntropyMixUpLabelSmooth(num_class(C.get()['dataset']), C.get().conf.get('lb_smooth', 0))
+    print(criterion)
+    
+    # optimizer
     if C.get()['optimizer']['type'] == 'sgd':
         optimizer = optim.SGD(
             model.parameters(),
@@ -153,7 +160,9 @@ def train_and_eval(tag, dataroot, test_ratio=0.0, cv_fold=0, reporter=None, metr
         )
     else:
         raise ValueError('invalid optimizer type=%s' % C.get()['optimizer']['type'])
+    print(optimizer)
 
+    # learning rate scheduler
     lr_scheduler_type = C.get()['lr_schedule'].get('type', 'cosine')
     if lr_scheduler_type == 'cosine':
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=C.get()['epoch'], eta_min=0.)
@@ -173,6 +182,7 @@ def train_and_eval(tag, dataroot, test_ratio=0.0, cv_fold=0, reporter=None, metr
             total_epoch=C.get()['lr_schedule']['warmup']['epoch'],
             after_scheduler=scheduler
         )
+    print(scheduler)
 
     if not tag or not is_master:
         from FastAutoAugment.metrics import SummaryWriterDummy as SummaryWriter
@@ -181,11 +191,13 @@ def train_and_eval(tag, dataroot, test_ratio=0.0, cv_fold=0, reporter=None, metr
         from tensorboardX import SummaryWriter
     writers = [SummaryWriter(log_dir='./logs/%s/%s' % (tag, x)) for x in ['train', 'valid', 'test']]
 
+    # exponential moving average
     if C.get()['optimizer']['ema'] > 0.0 and is_master:
         # https://discuss.pytorch.org/t/how-to-apply-exponential-moving-average-decay-for-variables/10856/4?u=ildoonet
         ema = EMA(C.get()['optimizer']['ema'])
     else:
         ema = None
+    print(ema)
 
     result = OrderedDict()
     epoch_start = 1

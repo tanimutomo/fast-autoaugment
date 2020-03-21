@@ -2,6 +2,7 @@ model:
   type: resnet56
 dataset: cifar10
 aug: fa_reduced_cifar10
+loss: ce
 cutout: 16
 batch: 128
 epoch: 200
