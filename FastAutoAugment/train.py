@@ -110,7 +110,7 @@ def train_and_eval(tag, dataroot, test_ratio=0.0, cv_fold=0, reporter=None, metr
     total_batch = C.get()["batch"]
     if local_rank >= 0:
         dist.init_process_group(backend='nccl', init_method='env://', world_size=int(os.environ['WORLD_SIZE']))
-        device = torch.device('cuda', local_rank)
+        device = torch.device(f'cuda:{args.gpu_id}', local_rank)
         torch.cuda.set_device(device)
 
         C.get()['lr'] *= dist.get_world_size()
@@ -345,6 +345,7 @@ if __name__ == '__main__':
     parser.add_argument('--local_rank', type=int, default=-1)
     parser.add_argument('--evaluation-interval', type=int, default=5)
     parser.add_argument('--only-eval', action='store_true')
+    parser.add_argument('--gpu_id', type=int, default=0)
     args = parser.parse_args()
 
     assert (args.only_eval and args.save) or not args.only_eval, 'checkpoint path not provided in evaluation mode.'
